@@ -56,7 +56,7 @@ const Portfolio = () => {
                 <div className="flex-1">
                     <div className="w-80 h-80">
                         <img
-                            src="src/assets/Group 46.png"
+                            src="/assets/Group 46.png"
                             alt="Elias character illustration"
                             className="w-full h-full object-contain"
                         />
@@ -253,7 +253,7 @@ const Portfolio = () => {
                             <div className="flex-1">
                                 <div className="w-80 h-80">
                                     <img
-                                        src="src/assets/Group 50.png"
+                                        src="/assets/Group 50.png"
                                         alt="Elias character illustration"
                                         className="w-full h-full object-contain"
                                     />
