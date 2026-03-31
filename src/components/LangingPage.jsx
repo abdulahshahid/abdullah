@@ -5,6 +5,32 @@ const Portfolio = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrollY, setScrollY] = useState(0);
 
+    const handleTiltMove = (event) => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const card = event.currentTarget;
+        const rect = card.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -7;
+        const rotateY = ((x - centerX) / centerX) * 7;
+
+        card.style.setProperty('--tilt-rotate-x', `${rotateX.toFixed(2)}deg`);
+        card.style.setProperty('--tilt-rotate-y', `${rotateY.toFixed(2)}deg`);
+        card.style.setProperty('--tilt-glow-x', `${(x / rect.width) * 100}%`);
+        card.style.setProperty('--tilt-glow-y', `${(y / rect.height) * 100}%`);
+    };
+
+    const resetTilt = (event) => {
+        const card = event.currentTarget;
+        card.style.setProperty('--tilt-rotate-x', '0deg');
+        card.style.setProperty('--tilt-rotate-y', '0deg');
+        card.style.setProperty('--tilt-glow-x', '50%');
+        card.style.setProperty('--tilt-glow-y', '50%');
+    };
+
     useEffect(() => {
         const handleScroll = () => setScrollY(window.scrollY);
         window.addEventListener('scroll', handleScroll);
@@ -133,6 +159,39 @@ const Portfolio = () => {
                 .glow-text { text-shadow: 0 0 20px rgba(102,252,241,0.4); }
                 .card-hover { transition: all 0.3s ease; }
                 .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(102,252,241,0.1); }
+                .tilt-wrap { perspective: 1200px; }
+                .tilt-card {
+                    --tilt-rotate-x: 0deg;
+                    --tilt-rotate-y: 0deg;
+                    --tilt-glow-x: 50%;
+                    --tilt-glow-y: 50%;
+                    transform-style: preserve-3d;
+                    transform: rotateX(var(--tilt-rotate-x)) rotateY(var(--tilt-rotate-y)) translateY(0);
+                    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+                    will-change: transform;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .tilt-card::after {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    pointer-events: none;
+                    border-radius: inherit;
+                    background: radial-gradient(circle at var(--tilt-glow-x) var(--tilt-glow-y), rgba(102,252,241,0.15), transparent 45%);
+                    opacity: 0;
+                    transition: opacity 220ms ease;
+                }
+                .tilt-card:hover::after { opacity: 1; }
+                .tilt-content { transform: translateZ(24px); }
+                @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+                    .tilt-card {
+                        transform: none !important;
+                        transition: box-shadow 220ms ease, border-color 220ms ease;
+                    }
+                    .tilt-card::after { display: none; }
+                    .tilt-content { transform: none; }
+                }
                 .nav-link::after { content:''; display:block; height:1px; background:#66fcf1; transform:scaleX(0); transition:transform 0.3s; transform-origin:left; }
                 .nav-link:hover::after { transform:scaleX(1); }
                 @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
@@ -226,16 +285,25 @@ const Portfolio = () => {
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {projects.map((p, i) => (
-                        <div key={i} className={`card-hover relative bg-[#0f1419] border border-[#1f2833] hover:border-[#66fcf1]/40 rounded-xl p-6 flex flex-col ${p.award ? 'ring-1 ring-[#66fcf1]/20' : ''}`}>
+                        <div className="tilt-wrap" key={i}>
+                            <div
+                                onMouseMove={handleTiltMove}
+                                onMouseLeave={resetTilt}
+                                onBlur={resetTilt}
+                                className={`tilt-card card-hover relative bg-[#0f1419] border border-[#1f2833] hover:border-[#66fcf1]/40 rounded-xl p-6 flex flex-col ${p.award ? 'ring-1 ring-[#66fcf1]/20' : ''}`}
+                            >
                             {p.award && <Award className="absolute top-4 right-4 text-[#66fcf1]" size={16} />}
-                            <div className="font-mono text-[#66fcf1] text-[10px] tracking-widest mb-2 uppercase">{p.tag}</div>
-                            <h3 className="font-display text-xl font-bold text-white mb-1">{p.title}</h3>
-                            <p className="font-mono text-xs text-[#45a29e] mb-3">{p.subtitle}</p>
-                            <p className="text-[#8b949e] text-sm leading-relaxed flex-1 mb-5">{p.desc}</p>
-                            <div className="flex flex-wrap gap-2">
-                                {p.stack.map(t => (
-                                    <span key={t} className="font-mono text-[10px] text-[#45a29e] bg-[#1f2833] px-2 py-1 rounded">{t}</span>
-                                ))}
+                                <div className="tilt-content">
+                                    <div className="font-mono text-[#66fcf1] text-[10px] tracking-widest mb-2 uppercase">{p.tag}</div>
+                                    <h3 className="font-display text-xl font-bold text-white mb-1">{p.title}</h3>
+                                    <p className="font-mono text-xs text-[#45a29e] mb-3">{p.subtitle}</p>
+                                    <p className="text-[#8b949e] text-sm leading-relaxed flex-1 mb-5">{p.desc}</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {p.stack.map(t => (
+                                            <span key={t} className="font-mono text-[10px] text-[#45a29e] bg-[#1f2833] px-2 py-1 rounded">{t}</span>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -282,17 +350,26 @@ const Portfolio = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {skillGroups.map((g, i) => (
-                            <div key={i} className="card-hover bg-[#0f1419] border border-[#1f2833] hover:border-[#66fcf1]/30 rounded-xl p-6">
-                                <div className="text-[#66fcf1] mb-4">{g.icon}</div>
-                                <h3 className="font-display text-base font-bold text-white mb-4">{g.title}</h3>
-                                <ul className="space-y-2">
-                                    {g.items.map(item => (
-                                        <li key={item} className="font-mono text-xs text-[#8b949e] flex items-center gap-2">
-                                            <span className="w-1 h-1 bg-[#45a29e] rounded-full flex-shrink-0" />
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
+                            <div className="tilt-wrap" key={i}>
+                                <div
+                                    onMouseMove={handleTiltMove}
+                                    onMouseLeave={resetTilt}
+                                    onBlur={resetTilt}
+                                    className="tilt-card card-hover bg-[#0f1419] border border-[#1f2833] hover:border-[#66fcf1]/30 rounded-xl p-6"
+                                >
+                                    <div className="tilt-content">
+                                        <div className="text-[#66fcf1] mb-4">{g.icon}</div>
+                                        <h3 className="font-display text-base font-bold text-white mb-4">{g.title}</h3>
+                                        <ul className="space-y-2">
+                                            {g.items.map(item => (
+                                                <li key={item} className="font-mono text-xs text-[#8b949e] flex items-center gap-2">
+                                                    <span className="w-1 h-1 bg-[#45a29e] rounded-full flex-shrink-0" />
+                                                    {item}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>
