@@ -1,93 +1,87 @@
 import React, { useState, useEffect } from 'react';
-import { Github, Mail, Menu, X, Linkedin, Terminal, Cpu, Database, Award, ExternalLink, Mic, Code2, Server, BookOpen, ChevronRight } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 
 const Portfolio = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [scrollY, setScrollY] = useState(0);
-
-    const handleTiltMove = (event) => {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-        const card = event.currentTarget;
-        const rect = card.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -7;
-        const rotateY = ((x - centerX) / centerX) * 7;
-
-        card.style.setProperty('--tilt-rotate-x', `${rotateX.toFixed(2)}deg`);
-        card.style.setProperty('--tilt-rotate-y', `${rotateY.toFixed(2)}deg`);
-        card.style.setProperty('--tilt-glow-x', `${(x / rect.width) * 100}%`);
-        card.style.setProperty('--tilt-glow-y', `${(y / rect.height) * 100}%`);
-    };
-
-    const resetTilt = (event) => {
-        const card = event.currentTarget;
-        card.style.setProperty('--tilt-rotate-x', '0deg');
-        card.style.setProperty('--tilt-rotate-y', '0deg');
-        card.style.setProperty('--tilt-glow-x', '50%');
-        card.style.setProperty('--tilt-glow-y', '50%');
-    };
+    const [scrolled, setScrolled] = useState(false);
+    const [dark, setDark] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        return localStorage.getItem('theme') === 'dark';
+    });
 
     useEffect(() => {
-        const handleScroll = () => setScrollY(window.scrollY);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        const onScroll = () => setScrolled(window.scrollY > 8);
+        window.addEventListener('scroll', onScroll);
+        return () => window.removeEventListener('scroll', onScroll);
     }, []);
+
+    useEffect(() => {
+        document.documentElement.classList.toggle('dark', dark);
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }, [dark]);
 
     const projects = [
         {
-            tag: "FINAL YEAR PROJECT • BEST FYP RUNNER-UP",
-            title: "Talk.ai",
-            subtitle: "AI-Powered Meeting Intelligence Platform",
-            desc: "End-to-end platform processing 10+ hours of meeting audio daily with 92% diarization accuracy. Microservices architecture with Django, Celery, Redis. Reduced manual documentation time by 80%.",
-            stack: ["React", "Django", "Celery", "Redis", "OpenAI"],
-            award: true,
+            year: "2025",
+            title: "Meretium",
+            subtitle: "AI-Powered Recruitment Platform",
+            desc: "4-service microservices architecture (Auth, Admin, Candidate, Recruiter) with JWT-based SSO, TOTP 2FA, and inter-service communication via httpx.AsyncClient. Hybrid candidate matching using cosine similarity on OpenAI embeddings cached in pgvector, with SHA-256 fingerprint cache invalidation. Automated AWS ECS Fargate deploys via GitHub Actions, gated on Alembic migrations, with per-org OpenAI cost tracking.",
+            stack: ["FastAPI", "PostgreSQL", "pgvector", "OpenAI", "AWS ECS", "Docker"],
         },
         {
-            tag: "SYBRID PVT. LTD.",
+            year: "2025",
+            title: "Talk.ai",
+            subtitle: "AI-Powered Meeting Intelligence",
+            note: "Best FYP, Runner-up",
+            desc: "End-to-end platform processing 10+ hours of meeting audio daily with 92% diarization accuracy. Microservices architecture with Django, Celery, and Redis. Reduced manual documentation time by 80%.",
+            stack: ["React", "Django", "Celery", "Redis", "OpenAI"],
+        },
+        {
+            year: "2025",
             title: "Skyzone AI Voice Agent",
             subtitle: "Real-time Inbound Call Handler",
             desc: "Conversational AI voice agent using Django, MySQL, OpenAI and WebRTC/Silero VAD. Automated booking and query handling for 300+ U.S. client locations with 85% autonomous resolution.",
             stack: ["FastAPI", "WebRTC", "MySQL", "ElevenLabs", "Twilio"],
         },
         {
-            tag: "HEALTHCARE AI",
+            year: "2024",
             title: "Voice-Health AI",
             subtitle: "Intelligent Healthcare Communication",
             desc: "Automated patient outreach using Twilio, LiveKit, and OpenAI. 89.3% success rate, 76.4% reduction in no-shows, saving staff 3.5 hours daily via real-time dashboards.",
             stack: ["Twilio", "LiveKit", "OpenAI", "FastAPI"],
         },
         {
-            tag: "NLP / VOICE",
+            year: "2024",
             title: "Domain-Specific ASR Engine",
             subtitle: "Urdu Speech-to-Text for QA",
-            desc: "Fine-tuned Whisper Large on 10-hour Urdu dataset. Automated pipeline with VAD, speaker diarization, and AWS GPU training. Integrated OpenAI API for KPI detection in call transcripts.",
+            desc: "Fine-tuned Whisper Large on a 10-hour Urdu dataset. Automated pipeline with VAD, speaker diarization, and AWS GPU training. Integrated the OpenAI API for KPI detection in call transcripts.",
             stack: ["Whisper", "PyTorch", "AWS", "VAD", "OpenAI"],
         },
         {
-            tag: "ENTERPRISE",
-            title: "Event Management Platform",
-            subtitle: "Access Control & Multi-tenant SaaS",
-            desc: "Multi-tenant platform with QR and biometric access validation, real-time zone occupancy tracking, and role-based permissions. Deployed with FastAPI, React, Redis, Docker, and Nginx.",
-            stack: ["FastAPI", "React", "Redis", "Docker", "Nginx"],
-        },
-        {
-            tag: "RAG / AI",
+            year: "2024",
             title: "Intelligent Support RAG System",
             subtitle: "Customer Support Automation",
-            desc: "End-to-end RAG system for car rental company via SMTP/IMAP. FAISS vector DB with 95% accuracy on 1000+ docs. 70% reduction in API costs, 35% boost in customer satisfaction.",
+            desc: "End-to-end RAG system for a car rental company over SMTP/IMAP. FAISS vector DB with 95% accuracy on 1000+ docs. 70% reduction in API costs, 35% boost in customer satisfaction.",
             stack: ["LangChain", "FAISS", "Ollama", "Python", "SMTP"],
         },
     ];
 
     const experience = [
         {
+            role: "Backend Engineer",
+            company: "Meretium",
+            period: "Feb 2025 – Present",
+            location: "UK (Remote)",
+            points: [
+                "Architected a distributed microservices backend of 4 independent services (Auth, Admin, Candidate, Recruiter) using FastAPI, PostgreSQL, and async SQLAlchemy, enabling independent scaling and clean service boundaries",
+                "Designed a hybrid AI matching engine combining 60% semantic similarity (OpenAI text-embedding-3-small + pgvector) with 40% deterministic attribute matching, cutting candidate search latency to 200–400ms via multi-tier vector caching",
+                "Built a schema-validated CV parsing pipeline using the instructor library and GPT-4 with Pydantic output guarantees, prompt-injection shielding, and automated profile refinement suggestions",
+                "Engineered a CI/CD pipeline with GitHub Actions targeting AWS ECS Fargate: builds multi-service Docker images, runs Alembic migrations as one-off ECS tasks, then triggers zero-downtime rolling deployments",
+            ],
+        },
+        {
             role: "Software Developer",
             company: "Sybrid Pvt. Ltd.",
-            period: "Aug 2025 – Present",
+            period: "Aug 2024 – Feb 2025",
             location: "Islamabad, Pakistan",
             points: [
                 "Built high-performance REST APIs with Django and FastAPI, integrating OpenAI, Twilio, and ElevenLabs",
@@ -110,7 +104,7 @@ const Portfolio = () => {
             period: "Jun 2024 – Aug 2024",
             location: "Lahore, Pakistan",
             points: [
-                "Fine-tuned BERT and GPT models achieving 15% accuracy improvement on NLP tasks",
+                "Fine-tuned BERT and GPT models achieving a 15% accuracy improvement on NLP tasks",
                 "Developed production-ready RAG pipelines using LangChain and FAISS vector similarity search",
             ],
         },
@@ -127,280 +121,172 @@ const Portfolio = () => {
 
     const skillGroups = [
         {
-            icon: <Mic size={28} />,
             title: "Voice & Conversational AI",
-            items: ["Silero VAD / WebRTC / VoIP", "Twilio · LiveKit · ElevenLabs", "OpenAI Realtime API", "Asterisk VoIP Server", "Whisper ASR Fine-tuning"],
+            items: ["Silero VAD", "WebRTC / VoIP", "Twilio", "LiveKit", "ElevenLabs", "OpenAI Realtime API", "Asterisk", "Whisper ASR"],
         },
         {
-            icon: <Cpu size={28} />,
-            title: "AI & ML",
-            items: ["LangChain · RAG Pipelines", "PyTorch · Transformers · Keras", "Hugging Face · Autogen", "FAISS · Pinecone · Elasticsearch", "MLflow & MLOps"],
+            title: "AI & Machine Learning",
+            items: ["LangChain", "RAG pipelines", "PyTorch", "Transformers", "Keras", "Hugging Face", "Autogen", "FAISS", "Pinecone", "MLflow"],
         },
         {
-            icon: <Server size={28} />,
             title: "Backend & Infrastructure",
-            items: ["FastAPI · Django · Node.js", "Celery + Redis / RabbitMQ", "WebSocket Streaming", "Docker · Nginx · Microservices", "MySQL · PostgreSQL · Redis"],
+            items: ["FastAPI", "Django", "Node.js", "Celery + Redis", "RabbitMQ", "WebSockets", "Docker", "Nginx", "PostgreSQL", "MySQL"],
         },
         {
-            icon: <Code2 size={28} />,
             title: "Languages & Tools",
-            items: ["Python · JavaScript · C/C++", "Git / GitHub / GitLab", "Linux Server Administration", "RESTful APIs · HTTP/Proxy", "AWS GPU Training Pipelines"],
+            items: ["Python", "JavaScript", "C / C++", "Git", "Linux administration", "REST APIs", "AWS GPU training"],
         },
     ];
 
+    const nav = [
+        ["#work", "Work"],
+        ["#experience", "Experience"],
+        ["#skills", "Skills"],
+        ["mailto:abdullah.shahid1045@gmail.com", "Email"],
+    ];
+
     return (
-        <div className="bg-[#0b0c10] text-[#c5c6c7] min-h-screen font-sans">
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased selection:bg-[var(--text)] selection:text-[var(--bg)]">
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap');
-                * { scroll-behavior: smooth; }
-                .font-mono { font-family: 'JetBrains Mono', monospace; }
-                .font-display { font-family: 'Syne', sans-serif; }
-                .glow { box-shadow: 0 0 20px rgba(102,252,241,0.15); }
-                .glow-text { text-shadow: 0 0 20px rgba(102,252,241,0.4); }
-                .card-hover { transition: all 0.3s ease; }
-                .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(102,252,241,0.1); }
-                .tilt-wrap { perspective: 1200px; }
-                .tilt-card {
-                    --tilt-rotate-x: 0deg;
-                    --tilt-rotate-y: 0deg;
-                    --tilt-glow-x: 50%;
-                    --tilt-glow-y: 50%;
-                    transform-style: preserve-3d;
-                    transform: rotateX(var(--tilt-rotate-x)) rotateY(var(--tilt-rotate-y)) translateY(0);
-                    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
-                    will-change: transform;
-                    position: relative;
-                    overflow: hidden;
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+                html { scroll-behavior: smooth; }
+                body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+                :root {
+                    --bg: #f7f6f3; --text: #1a1a1a; --muted: #6b6b6b; --body: #4a4a4a;
+                    --faint: #9a978f; --fainter: #bdbab2; --line: #e6e4df; --header-bg: rgba(247,246,243,.8);
                 }
-                .tilt-card::after {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    pointer-events: none;
-                    border-radius: inherit;
-                    background: radial-gradient(circle at var(--tilt-glow-x) var(--tilt-glow-y), rgba(102,252,241,0.15), transparent 45%);
-                    opacity: 0;
-                    transition: opacity 220ms ease;
+                :root.dark {
+                    --bg: #131312; --text: #ededeb; --muted: #9a978f; --body: #b6b3ab;
+                    --faint: #75726a; --fainter: #565349; --line: #292825; --header-bg: rgba(19,19,18,.8);
                 }
-                .tilt-card:hover::after { opacity: 1; }
-                .tilt-content { transform: translateZ(24px); }
-                @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
-                    .tilt-card {
-                        transform: none !important;
-                        transition: box-shadow 220ms ease, border-color 220ms ease;
-                    }
-                    .tilt-card::after { display: none; }
-                    .tilt-content { transform: none; }
-                }
-                .nav-link::after { content:''; display:block; height:1px; background:#66fcf1; transform:scaleX(0); transition:transform 0.3s; transform-origin:left; }
-                .nav-link:hover::after { transform:scaleX(1); }
-                @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-                @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-                .animate-fade-up { animation: fadeUp 0.8s ease forwards; }
-                .delay-1 { animation-delay: 0.1s; opacity:0; }
-                .delay-2 { animation-delay: 0.25s; opacity:0; }
-                .delay-3 { animation-delay: 0.4s; opacity:0; }
-                .delay-4 { animation-delay: 0.55s; opacity:0; }
-                .cursor-blink::after { content:'_'; animation: blink 1s infinite; color:#66fcf1; }
-                .grid-bg { background-image: linear-gradient(rgba(102,252,241,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(102,252,241,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+                html, body { background: var(--bg); }
+                body, body * { transition: background-color .35s ease, border-color .35s ease, color .35s ease; }
+                .u-link { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size .3s ease, color .35s ease; }
+                .u-link:hover { background-size: 100% 1px; }
             `}</style>
 
-            {/* Nav */}
-            <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrollY > 40 ? 'bg-[#0b0c10]/95 backdrop-blur-md border-b border-[#1f2833]' : 'bg-transparent'}`}>
-                <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
-                    <div className="flex items-center space-x-2 cursor-pointer">
-                        <Terminal className="text-[#66fcf1]" size={20} />
-                        <span className="font-mono font-bold text-lg tracking-tighter text-white">AS<span className="text-[#66fcf1]">.</span>dev</span>
-                    </div>
-                    <div className="hidden md:flex items-center space-x-8 font-mono text-xs uppercase tracking-widest">
-                        {[["#projects","01. Work"],["#experience","02. XP"],["#skills","03. Stack"]].map(([href,label])=>(
-                            <a key={href} href={href} className="nav-link hover:text-[#66fcf1] transition-colors pb-0.5">{label}</a>
+            {/* Header */}
+            <header className={`sticky top-0 z-50 transition-colors duration-300 ${scrolled ? 'bg-[var(--header-bg)] backdrop-blur-sm border-b border-[var(--line)]' : 'border-b border-transparent'}`}>
+                <div className="mx-auto max-w-3xl px-6 h-16 flex items-center justify-between">
+                    <a href="#top" className="text-sm font-medium tracking-tight">Abdullah Shahid</a>
+                    <nav className="flex items-center gap-6 text-sm text-[var(--muted)]">
+                        {nav.map(([href, label]) => (
+                            <a key={href} href={href} className="u-link hover:text-[var(--text)] transition-colors hidden sm:inline">{label}</a>
                         ))}
-                        <a href="mailto:abdullah.shahid1045@gmail.com" className="px-4 py-1.5 border border-[#66fcf1] text-[#66fcf1] hover:bg-[#66fcf1] hover:text-[#0b0c10] transition-all rounded font-bold text-xs">Hire Me</a>
-                    </div>
-                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden text-[#66fcf1]">
-                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
-                </div>
-                {isMenuOpen && (
-                    <div className="md:hidden bg-[#0b0c10] border-b border-[#1f2833] px-6 py-4 space-y-4 font-mono text-sm">
-                        {[["#projects","Projects"],["#experience","Experience"],["#skills","Stack"]].map(([href,label])=>(
-                            <a key={href} href={href} className="block hover:text-[#66fcf1]" onClick={()=>setIsMenuOpen(false)}>{label}</a>
-                        ))}
-                    </div>
-                )}
-            </nav>
-
-            {/* Hero */}
-            <header className="relative pt-36 pb-24 px-6 max-w-6xl mx-auto grid-bg overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-radial from-[#66fcf1]/5 via-transparent to-transparent" style={{background: 'radial-gradient(ellipse 60% 50% at 60% 40%, rgba(102,252,241,0.06) 0%, transparent 70%)'}} />
-                <div className="relative z-10">
-                    <p className="font-mono text-[#66fcf1] text-xs mb-5 tracking-[0.3em] animate-fade-up">BACKEND ENGINEER · AI SYSTEMS · ISLAMABAD, PK</p>
-                    <h1 className="font-display text-6xl md:text-8xl font-extrabold text-white mb-4 leading-none tracking-tight animate-fade-up delay-1">
-                        Abdullah<br/><span className="text-[#45a29e]">Shahid</span><span className="text-[#66fcf1]">.</span>
-                    </h1>
-                    <h2 className="font-display text-xl md:text-2xl font-semibold text-[#8b949e] mb-8 animate-fade-up delay-2 cursor-blink">
-                        I build real-time Voice AI & scalable backend systems
-                    </h2>
-                    <p className="max-w-2xl text-[#8b949e] leading-relaxed mb-10 animate-fade-up delay-3">
-                        Backend Engineer at <span className="text-white font-semibold">Sybrid Pvt. Ltd.</span> — specializing in production-grade microservices, 
-                        <span className="text-[#66fcf1]"> real-time conversational AI</span>, and LLM-integrated backend architectures. 
-                        B.Sc. Computer Science, Namal University.
-                    </p>
-                    <div className="flex flex-wrap gap-4 animate-fade-up delay-4">
-                        <a href="#projects" className="px-8 py-3 bg-[#66fcf1] text-[#0b0c10] font-bold font-mono text-sm rounded hover:bg-[#45a29e] transition-colors">view_work()</a>
-                        <a href="https://www.linkedin.com/in/abdullah-shahid-8a1192263/" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-6 py-3 border border-[#1f2833] hover:border-[#66fcf1]/50 text-[#8b949e] hover:text-white transition-all rounded font-mono text-sm">
-                            <Linkedin size={16}/> LinkedIn
-                        </a>
-                        <a href="mailto:abdullah.shahid1045@gmail.com" className="flex items-center gap-2 px-6 py-3 border border-[#1f2833] hover:border-[#66fcf1]/50 text-[#8b949e] hover:text-white transition-all rounded font-mono text-sm">
-                            <Mail size={16}/> Email
-                        </a>
-                    </div>
+                        <button
+                            onClick={() => setDark(d => !d)}
+                            aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
+                            className="flex items-center justify-center w-8 h-8 -mr-1.5 rounded-full text-[var(--muted)] hover:text-[var(--text)] transition-colors"
+                        >
+                            {dark ? <Sun size={16} /> : <Moon size={16} />}
+                        </button>
+                    </nav>
                 </div>
             </header>
 
-            {/* Stats Ribbon */}
-            <div className="bg-[#0f1419] border-y border-[#1f2833] py-8">
-                <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                    {[
-                        ["85%", "Autonomous Call Resolution"],
-                        ["92%", "Diarization Accuracy"],
-                        ["60%", "DB Query Speedup"],
-                        ["Best FYP", "Runner-up, Namal Univ."],
-                    ].map(([val, label]) => (
-                        <div key={label} className="group">
-                            <div className="font-display text-2xl md:text-3xl font-bold text-white group-hover:text-[#66fcf1] transition-colors glow-text">{val}</div>
-                            <div className="font-mono text-[10px] uppercase tracking-widest text-[#45a29e] mt-1">{label}</div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            <main id="top" className="mx-auto max-w-3xl px-6">
 
-            {/* Projects */}
-            <section id="projects" className="py-28 px-6 max-w-7xl mx-auto">
-                <div className="flex items-center gap-4 mb-16">
-                    <span className="font-mono text-[#66fcf1] text-sm">01.</span>
-                    <h2 className="font-display text-3xl font-bold text-white">Featured Work</h2>
-                    <div className="h-px bg-[#1f2833] flex-1" />
-                </div>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {projects.map((p, i) => (
-                        <div className="tilt-wrap" key={i}>
-                            <div
-                                onMouseMove={handleTiltMove}
-                                onMouseLeave={resetTilt}
-                                onBlur={resetTilt}
-                                className={`tilt-card card-hover relative bg-[#0f1419] border border-[#1f2833] hover:border-[#66fcf1]/40 rounded-xl p-6 flex flex-col ${p.award ? 'ring-1 ring-[#66fcf1]/20' : ''}`}
-                            >
-                            {p.award && <Award className="absolute top-4 right-4 text-[#66fcf1]" size={16} />}
-                                <div className="tilt-content">
-                                    <div className="font-mono text-[#66fcf1] text-[10px] tracking-widest mb-2 uppercase">{p.tag}</div>
-                                    <h3 className="font-display text-xl font-bold text-white mb-1">{p.title}</h3>
-                                    <p className="font-mono text-xs text-[#45a29e] mb-3">{p.subtitle}</p>
-                                    <p className="text-[#8b949e] text-sm leading-relaxed flex-1 mb-5">{p.desc}</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {p.stack.map(t => (
-                                            <span key={t} className="font-mono text-[10px] text-[#45a29e] bg-[#1f2833] px-2 py-1 rounded">{t}</span>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            {/* Experience */}
-            <section id="experience" className="py-28 bg-[#080a0d] px-6">
-                <div className="max-w-4xl mx-auto">
-                    <div className="flex items-center gap-4 mb-16">
-                        <span className="font-mono text-[#66fcf1] text-sm">02.</span>
-                        <h2 className="font-display text-3xl font-bold text-white">Experience</h2>
-                        <div className="h-px bg-[#1f2833] flex-1" />
+                {/* Intro */}
+                <section className="pt-24 pb-20">
+                    <h1 className="text-3xl sm:text-4xl font-medium leading-tight tracking-tight max-w-2xl">
+                        I'm Abdullah — a backend engineer building voice AI and the systems behind it.
+                    </h1>
+                    <p className="mt-6 text-[var(--body)] leading-relaxed max-w-xl">
+                        Currently a Backend Engineer at Meretium (UK, remote), where I work on distributed
+                        microservices and LLM-integrated backends. Before that, real-time conversational AI at
+                        Sybrid. B.Sc. in Computer Science from Namal University. Based in Islamabad, Pakistan.
+                    </p>
+                    <div className="mt-8 flex items-center gap-6 text-sm">
+                        <a href="mailto:abdullah.shahid1045@gmail.com" className="u-link">Get in touch</a>
+                        <a href="https://github.com/abdulahshahid" target="_blank" rel="noreferrer" className="u-link text-[var(--muted)] hover:text-[var(--text)] transition-colors">GitHub</a>
+                        <a href="https://www.linkedin.com/in/abdullah-shahid-8a1192263/" target="_blank" rel="noreferrer" className="u-link text-[var(--muted)] hover:text-[var(--text)] transition-colors">LinkedIn</a>
                     </div>
-                    <div className="space-y-0">
+                </section>
+
+                {/* Work */}
+                <section id="work" className="py-16 border-t border-[var(--line)]">
+                    <h2 className="text-sm font-medium text-[var(--muted)] mb-10">Selected work</h2>
+                    <div className="divide-y divide-[var(--line)]">
+                        {projects.map((p, i) => (
+                            <article key={i} className="group grid grid-cols-[3rem_1fr] gap-x-4 py-7 first:pt-0">
+                                <span className="text-sm text-[var(--faint)] tabular-nums pt-0.5">{p.year}</span>
+                                <div>
+                                    <div className="flex items-baseline justify-between gap-4">
+                                        <h3 className="text-lg font-medium tracking-tight">{p.title}</h3>
+                                        {p.note && <span className="text-xs text-[var(--faint)] whitespace-nowrap">{p.note}</span>}
+                                    </div>
+                                    <p className="text-[var(--muted)] text-sm mt-0.5">{p.subtitle}</p>
+                                    <p className="text-[var(--body)] text-sm leading-relaxed mt-3 max-w-xl">{p.desc}</p>
+                                    <p className="text-[var(--faint)] text-xs mt-3">{p.stack.join("  ·  ")}</p>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Experience */}
+                <section id="experience" className="py-16 border-t border-[var(--line)]">
+                    <h2 className="text-sm font-medium text-[var(--muted)] mb-10">Experience</h2>
+                    <div className="space-y-12">
                         {experience.map((e, i) => (
-                            <div key={i} className="relative pl-8 pb-12 last:pb-0 border-l border-[#1f2833] last:border-transparent group">
-                                <div className="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-[#1f2833] border-2 border-[#45a29e] group-hover:border-[#66fcf1] transition-colors" />
-                                <div className="font-mono text-[10px] uppercase tracking-widest text-[#45a29e] mb-1">{e.period} · {e.location}</div>
-                                <h3 className="font-display text-xl font-bold text-white">{e.role}</h3>
-                                <p className="font-mono text-sm text-[#66fcf1] mb-4">{e.company}</p>
-                                <ul className="space-y-2">
-                                    {e.points.map((pt, j) => (
-                                        <li key={j} className="flex gap-2 text-[#8b949e] text-sm">
-                                            <ChevronRight size={14} className="text-[#66fcf1] mt-0.5 flex-shrink-0" />
-                                            {pt}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Skills */}
-            <section id="skills" className="py-28 px-6">
-                <div className="max-w-6xl mx-auto">
-                    <div className="flex items-center gap-4 mb-16">
-                        <div className="h-px bg-[#1f2833] flex-1" />
-                        <h2 className="font-display text-3xl font-bold text-white">Technical Stack</h2>
-                        <span className="font-mono text-[#66fcf1] text-sm">03.</span>
-                        <div className="h-px bg-[#1f2833] flex-1" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {skillGroups.map((g, i) => (
-                            <div className="tilt-wrap" key={i}>
-                                <div
-                                    onMouseMove={handleTiltMove}
-                                    onMouseLeave={resetTilt}
-                                    onBlur={resetTilt}
-                                    className="tilt-card card-hover bg-[#0f1419] border border-[#1f2833] hover:border-[#66fcf1]/30 rounded-xl p-6"
-                                >
-                                    <div className="tilt-content">
-                                        <div className="text-[#66fcf1] mb-4">{g.icon}</div>
-                                        <h3 className="font-display text-base font-bold text-white mb-4">{g.title}</h3>
-                                        <ul className="space-y-2">
-                                            {g.items.map(item => (
-                                                <li key={item} className="font-mono text-xs text-[#8b949e] flex items-center gap-2">
-                                                    <span className="w-1 h-1 bg-[#45a29e] rounded-full flex-shrink-0" />
-                                                    {item}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
+                            <div key={i} className="grid sm:grid-cols-[10rem_1fr] gap-x-6 gap-y-1">
+                                <div className="text-sm text-[var(--faint)] sm:pt-0.5">
+                                    <div>{e.period}</div>
+                                    <div className="text-[var(--fainter)]">{e.location}</div>
+                                </div>
+                                <div>
+                                    <h3 className="font-medium tracking-tight">{e.role}</h3>
+                                    <p className="text-sm text-[var(--muted)] mb-3">{e.company}</p>
+                                    <ul className="space-y-2">
+                                        {e.points.map((pt, j) => (
+                                            <li key={j} className="text-[var(--body)] text-sm leading-relaxed max-w-xl">{pt}</li>
+                                        ))}
+                                    </ul>
                                 </div>
                             </div>
                         ))}
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* Education */}
-            <section className="py-16 bg-[#080a0d] px-6 border-t border-[#1f2833]">
-                <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                    <div className="flex gap-4 items-start">
-                        <BookOpen className="text-[#66fcf1] mt-1 flex-shrink-0" size={24} />
+                {/* Skills */}
+                <section id="skills" className="py-16 border-t border-[var(--line)]">
+                    <h2 className="text-sm font-medium text-[var(--muted)] mb-10">Skills</h2>
+                    <div className="space-y-8">
+                        {skillGroups.map((g, i) => (
+                            <div key={i} className="grid sm:grid-cols-[10rem_1fr] gap-x-6 gap-y-1">
+                                <h3 className="text-sm font-medium tracking-tight sm:pt-0.5">{g.title}</h3>
+                                <p className="text-[var(--body)] text-sm leading-relaxed max-w-xl">{g.items.join("  ·  ")}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Education */}
+                <section className="py-16 border-t border-[var(--line)]">
+                    <h2 className="text-sm font-medium text-[var(--muted)] mb-10">Education</h2>
+                    <div className="grid sm:grid-cols-[10rem_1fr] gap-x-6 gap-y-1">
+                        <div className="text-sm text-[var(--faint)] sm:pt-0.5">2021 – 2025</div>
                         <div>
-                            <p className="font-mono text-[10px] uppercase tracking-widest text-[#45a29e] mb-1">2021 – 2025</p>
-                            <h3 className="font-display text-xl font-bold text-white">B.Sc. Computer Science</h3>
-                            <p className="font-mono text-sm text-[#66fcf1]">Namal University, Mianwali</p>
-                            <p className="font-mono text-xs text-[#8b949e] mt-1">CGPA: 3.4 · Best FYP Runner-up Award · MLOps Certification (Coursera, 2024)</p>
+                            <h3 className="font-medium tracking-tight">B.Sc. Computer Science</h3>
+                            <p className="text-sm text-[var(--muted)]">Namal University, Mianwali</p>
+                            <p className="text-[var(--body)] text-sm mt-2 max-w-xl">
+                                CGPA 3.4 · Best FYP Runner-up · MLOps Certification (Coursera, 2024)
+                            </p>
                         </div>
                     </div>
-                    
-                </div>
-            </section>
+                </section>
+
+            </main>
 
             {/* Footer */}
-            <footer className="py-10 border-t border-[#1f2833] text-center">
-                <p className="font-mono text-xs text-[#45a29e] mb-6">
-                    Designed & Built by <span className="text-white font-semibold">Abdullah Shahid</span> · Islamabad, Pakistan
-                </p>
-                <div className="flex justify-center space-x-6 text-[#45a29e]">
-                    <a href="mailto:abdullah.shahid1045@gmail.com" className="hover:text-[#66fcf1] transition-colors"><Mail size={18}/></a>
-                    <a href="https://github.com/abdulahshahid" target="_blank" rel="noreferrer" className="hover:text-[#66fcf1] transition-colors"><Github size={18}/></a>
-                    <a href="https://www.linkedin.com/in/abdullah-shahid-8a1192263/" target="_blank" rel="noreferrer" className="hover:text-[#66fcf1] transition-colors"><Linkedin size={18}/></a>
+            <footer className="border-t border-[var(--line)]">
+                <div className="mx-auto max-w-3xl px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-sm text-[var(--faint)]">
+                    <p>Islamabad, Pakistan</p>
+                    <div className="flex items-center gap-6">
+                        <a href="mailto:abdullah.shahid1045@gmail.com" className="u-link hover:text-[var(--text)] transition-colors">Email</a>
+                        <a href="https://github.com/abdulahshahid" target="_blank" rel="noreferrer" className="u-link hover:text-[var(--text)] transition-colors">GitHub</a>
+                        <a href="https://www.linkedin.com/in/abdullah-shahid-8a1192263/" target="_blank" rel="noreferrer" className="u-link hover:text-[var(--text)] transition-colors">LinkedIn</a>
+                    </div>
                 </div>
             </footer>
         </div>
